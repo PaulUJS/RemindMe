@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminders</title>
+    <link rel="stylesheet" href="reminders.css">
+</head>
+<body>
+    <div class="nav-container">
+        <div class="wrapper">
+            <nav>
+                <div class="logo">
+                    <h1>RemindMe</h1>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <hr>
+
+    <main>
+        <form action="/reminders" method="post" id="reminders">
+        <div class="reminder-main">
+            <div class="reminder-container">
+                <div class="reminder-text">
+                    <label for="reminder-text">Enter reminder</label>
+                </div>
+
+                <div>
+                    <% current_reminder.forEach(element => { %>
+                    <input type="text" name="reminder" id="reminder" value="<%= element.content %>" required>
+                </div>
+                
+                <div class="reminder-date">
+                    <label for="reminder-date">Choose a date for your reminder</label>
+                </div>
+
+                <div>
+                    <input type="date" value="<%= element.date %>" id="reminder-date-input"
+                        name="reminderdate" min="2022-01-01" max="2024-01-01"  required>
+                </div>
+
+                <div class="reminder-time">
+                    <label for="reminder-time">Choose a time for your reminder</label>
+                </div>
+
+                <div>
+                    <input type="time" id="reminder-time-input" name="remindertime" 
+                    value="<%= element.time %>" required>
+                    <% }) %> 
+                </div>
+
+                <div class="button">
+                    <button type="submit" class="reminder-btn">RemindMe</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </main>
+    
+    <script src="main.js" type="script/javascript"></script>
+</body>
+</html>

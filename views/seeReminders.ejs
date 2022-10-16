@@ -34,23 +34,19 @@
     <main>
         <div class="user-main">
             <div class="user-container">
-                <form action="/seeReminders" type="submit">
                 <div class="reminders" id="reminders-logo">
-                    <button type="submit">User's reminders</button> 
+                    <p>User's Reminders</p>
                 </div>
-                </form>
                 <div class="reminders" id="reminders-id">
-                    <ul>
-                        <% current_reminder.forEach(element => { %>
-                            <h2>Reminder <%= element.id %></h2>
-                            <h2><%= element.date %></h2>
-                            <h2><%= element.time %></h2>   
-                            <p class="content"><%= element.content %></p>   
-                    </ul>
+                    <% current_reminder.forEach(element => { %>
+                        <p>Reminder <%= element.id %></p>
+                        <p><%= element.date %></p>
+                        <p><%= element.time %></p>   
+                        <p class="content"><%= element.content %></p>   
                 </div>
-                <a href="reminders">
-                <button type="submit" class="change" id="edit">Add reminder</button>
-                </a>
+                <form action="/seeReminders/edit/<%= element.id %>">
+                <button type="submit" class="change" id="edit">Edit reminder</button>
+                </form>
                 <form action="/seeReminders/delete/<%= element.id %>">
                 <button type="submit" class="change" id="remove">Remove reminder</button>
                 </form>

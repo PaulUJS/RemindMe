@@ -389,9 +389,25 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
 })
 
 // Calls function that edits reminder at specified ID
-app.get('/seeReminders/:edit', async (req, res) => {
-
-    res.render('seeReminders');
+app.get('/seeReminders/:edit/:id', async (req, res) => {
+    user_reminders.forEach(x => {
+        // ID of reminder user clicked on to delete
+        let id = req.params['id'];
+        //  ID param is an object so this gets the value of the object, returning the ID
+        let i = Object.values(id);
+        
+        // Checks which reminder i(the chosen reminders ID) is equal to
+        if (i == JSON.stringify(x['id'])) {
+            console.log(`index is ${user_reminders.indexOf(x)}`)
+            let index = user_reminders.indexOf(x)
+            // Removes reminder from user_reminders that user wants to delete
+            user_reminders.splice(index, 1)
+            console.log(user_reminders)
+            // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
+            console.log(`Reminders pushed: ${current_reminder}`);
+        }
+    })
+    res.redirect('/editReminders')
 })
 
 // Once user clicks on a reminder calls function that grabs the reminder
@@ -409,9 +425,9 @@ app.get('/checkreminder/:id', async (req, res) => {
             console.log(JSON.stringify(x['time']))
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
             current_reminder.push({
-                time: JSON.stringify(x['time']),
-                date: JSON.stringify(x['date']),
-                content: JSON.stringify(x['content']),
+                time: x['time'],
+                date: x['date'],
+                content: x['content'],
                 id: x['id']
             });
             console.log(`Reminders pushed: ${current_reminder}`);
