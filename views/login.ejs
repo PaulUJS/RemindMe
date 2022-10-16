@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in</title>
+    <link rel="stylesheet" href="loginstyle.css">
+</head>
+<body'>
+    <div class="nav-container">
+        <div class="wrapper">
+            <nav>
+                <div class="logo">
+                    <h1>RemindMe</h1>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <main>
+    <form action="/login" method="post" id="login">
+        <div class="login-main">
+            <div class="login-container">
+
+                <div class="log-in">
+                <h1>Log in</h1>
+                </div>
+
+                <div class="email">
+                <label for="email"><b>Email</b></label>
+                </div>
+
+                <div>
+                <input type="text" placeholder="Enter Email" class="email-input" name="email" required>
+                </div>
+
+                <div class="password">
+                <label for="password"><b>Password</b></label>
+                </div>
+
+                <div>
+                <input type="password" placeholder="Enter Password" class="pass-input" name="password" required>
+                </div>
+
+                <div class="button">
+                    <a href="">
+                    <button  action="/userpage" type="submit" class="log-in-btn">Log in</button>
+                    </a>
+                </div>
+
+                <label>
+                    <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+                </label>
+
+            </div>
+        </div>
+    </form>
+    </main>
+    <script src="main.js" type="script/javascript"></script>
+</body>
+</html>

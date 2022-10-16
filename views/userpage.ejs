@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <link rel="stylesheet" href="userpagestyle.css">
+</head>
+<body>
+
+    <div class="nav-container">
+        <div class="wrapper">
+            <nav>
+                <div class="logo">
+                    <h1>RemindMe</h1>
+                </div>
+
+                <ul class="nav-items">
+                    <form action="/userpage/logout" method="put" id="log_out">
+                    <li>
+                        <a href="">
+                        <button class="log-out" id="log">
+                        logout
+                        </button>
+                        </a>
+                    </li>
+                    </form>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <hr>
+
+    <main>
+        <div class="user-main">
+            <div class="user-container">
+                <div class="reminders" id="reminders-logo">
+                    <button type="submit">User's reminders</button> 
+                </div>
+                <div class="reminders" id="reminders-id">
+                    <ul>
+                        <% user_reminders.forEach(element => { %>
+                            <form action="/checkreminder/<%= element.id %>" type="submit">
+                            <button type="submit">
+                            <h2>Reminder <%= element.id %></h2>
+                            </button>
+                            </form>
+                            <h2><%= element.date %></h2>
+                            <h2><%= element.time %></h2>   
+                            <p class="content"><%= element.content %></p>
+                        <% }) %>    
+                        
+                    </ul>
+                </div>
+                <div>
+                <a href="reminders">
+                <button type="submit" class="change" id="add">Add reminder</button>
+                </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <script src="main.js" type="script/javascript">
+    </script>
+</body>
+</html>
