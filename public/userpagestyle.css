@@ -129,12 +129,10 @@ p {
     line-height: 30px;
     background-color: white;
     text-align: center;
-    width: fit-content;
-    height: fit-content;
     border-radius: 100px;
-
+    height:fit-content;
+    width: 200px;
 }
-
 
 #reminders-id {
     display: flex;                  
@@ -182,13 +180,17 @@ a {
     text-align: center;
     width: 100%;
     height: auto;
+    border-color: white;
+    border-style: none;
 }
 
 .reminder-form {
-    background-color: white;
+    height: fit-content;
+    width: fit-content;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-color: white;
+    border-style: none;
     text-align: center;
-    width: 50%;
-    height: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    background-color: white;
 }

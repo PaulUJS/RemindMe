@@ -309,8 +309,8 @@ app.post('/reminders', async (req, res)  => {
 
         // Variables for reminder that will be inserted into db
         let str = JSON.stringify(req.body.remindertime);
-        let date = JSON.stringify(req.body.reminderdate);
-        let reminder = JSON.stringify(req.body.reminder);
+        let date = req.body.reminderdate;
+        let reminder = req.body.reminder;
         const id = user_id;
         var finalTime;
 
@@ -348,7 +348,7 @@ app.post('/reminders', async (req, res)  => {
         let len = user_reminders.length
         console.log(`index of final reminder: ${len}`)
         user_reminders.push({
-            id: len+1,
+            id: len+1   ,
             date: date,
             time: finalTime,
             content: reminder
