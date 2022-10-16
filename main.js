@@ -202,6 +202,7 @@ app.get('/login', (req, res) => {
     }
     // If user isn't logged in then they're sent the login page
     else {
+        user_reminders = [];
         console.log('no active users')
         res.render('login');
     }
@@ -260,6 +261,7 @@ app.get('/userpage', async (req, res,) => {
     console.log('userpage rendered')
     // Check to make sure user matches profile
     let email = req.session.user
+    current_reminder = []
     console.log(`this is the email ${email}`)
 });
 
@@ -343,7 +345,10 @@ app.post('/reminders', async (req, res)  => {
         })
         // Inserts an Object containing the user's reminder data into an array
         // This is so the user page reminder elements can change without relogging once reminder is created
+        let len = user_reminders.length
+        console.log(`index of final reminder: ${len}`)
         user_reminders.push({
+            id: len+1,
             date: date,
             time: finalTime,
             content: reminder
@@ -376,7 +381,6 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
             user_reminders.splice(index, 1)
             console.log(user_reminders)
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
-            current_reminder = []
             console.log(`Reminders pushed: ${current_reminder}`);
         }
     })
@@ -408,7 +412,7 @@ app.get('/checkreminder/:id', async (req, res) => {
                 time: JSON.stringify(x['time']),
                 date: JSON.stringify(x['date']),
                 content: JSON.stringify(x['content']),
-                id: JSON.stringify(x['id'])
+                id: x['id']
             });
             console.log(`Reminders pushed: ${current_reminder}`);
         }

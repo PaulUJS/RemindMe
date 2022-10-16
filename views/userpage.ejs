@@ -39,19 +39,16 @@
                     <button type="submit">User's reminders</button> 
                 </div>
                 <div class="reminders" id="reminders-id">
-                    <ul>
-                        <% user_reminders.forEach(element => { %>
-                            <form action="/checkreminder/<%= element.id %>" type="submit">
-                            <button type="submit">
-                            <h2>Reminder <%= element.id %></h2>
-                            </button>
-                            </form>
-                            <h2><%= element.date %></h2>
-                            <h2><%= element.time %></h2>   
-                            <p class="content"><%= element.content %></p>
-                        <% }) %>    
-                        
-                    </ul>
+                    <% user_reminders.forEach(element => { %>
+                        <form action="/checkreminder/<%= element.id %>" type="submit" class="reminder-form">
+                        <button type="submit" class="reminder-button">
+                        <p>Reminder <%= element.id %></p>
+                        </form>
+                        <p><%= element.date %></p>
+                        <p><%= element.time %></p> 
+                        <p class="content"><%= element.content %></p>
+                        </button>
+                    <% }) %>    
                 </div>
                 <div>
                 <a href="reminders">
