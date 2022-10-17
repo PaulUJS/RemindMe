@@ -375,6 +375,17 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
             console.log(user_reminders)
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
             console.log(`Reminders pushed: ${current_reminder}`);
+
+            // query for deleting the reminder
+            const sqlDelete = "DELETE FROM reminders WHERE id = ? AND re_id = ?";
+            const delete_query = mysql.format(sqlDelete,[user_id, index+1]);
+            
+            // Deletes the reminder information into the db
+            db.query(delete_query, async (err, res) => {
+                if (err) throw err;
+                    console.log(`reminder ${index+1} deleted`);
+                    console.log(`User id ${id} deleted this reminder`)
+            })
         }
     })
     // Once remnider is deleted user is redirected to user page
@@ -453,8 +464,8 @@ app.post('/editReminders', async (req, res) => {
         for (let x = 0; x < 3; x++){
             if (x == 0){
                 // Needs to get the reminder based on user_id
-                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
-                let update_query = mysql.format(sqlUpdate,[{reminder: reminder}, arr['id']]);
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
+                let update_query = mysql.format(sqlUpdate,[{reminder: reminder}, arr['id'], user_id[0]]);
                 
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
@@ -465,8 +476,8 @@ app.post('/editReminders', async (req, res) => {
             }
             if (x == 1) {
                 // Needs to get the reminder based on user_id
-                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
-                let update_query = mysql.format(sqlUpdate,[{date: date}, arr['id']]);
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
+                let update_query = mysql.format(sqlUpdate,[{date: date}, arr['id'], user_id[0]]);
                 
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
@@ -477,8 +488,8 @@ app.post('/editReminders', async (req, res) => {
             }
             if (x == 2) {
                 // Needs to get the reminder based on user_id
-                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
-                let update_query = mysql.format(sqlUpdate,[{time: finalTime}, arr['id']]);
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
+                let update_query = mysql.format(sqlUpdate,[{time: finalTime}, arr['id'], user_id[0]]);
                 
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
