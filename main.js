@@ -79,7 +79,7 @@ app.listen('3000', () => {
 
 // Create the reminders table
 app.get('/createremindertable', (req, res) => {
-    let sql = 'CREATE TABLE reminders(id int, reminder VARCHAR(255), date VARCHAR(255), time VARCHAR(255), re_id int AUTO_INCREMENT, PRIMARY KEY (id))';
+    let sql = 'CREATE TABLE reminders(id int NOT NULL, reminder VARCHAR(255), date VARCHAR(255), time VARCHAR(255), re_id int NOT NULL, PRIMARY KEY (id, re_id))';
     db.query(sql, (err, result) => {
         if(err) throw err;
         console.log(result);
@@ -122,7 +122,7 @@ function getReminders(new_id) {
                 id: reminderID
             });
 
-            console.log(user_reminders);
+            console.log(res);
         }
 
         if (res.length == 0) {
@@ -257,7 +257,7 @@ app.post("/login", async (req, res)=> {
 // Gets the user html page
 app.get('/userpage', async (req, res,) => {
     console.log('userpage received')
-    console.log(`this is user id ${user_id}`)
+    console.log(`this is user id ${user_id[0]}`)
     // Renders userpage with the users reminders as html elements
     res.render('userpage', {user_reminders: user_reminders});
     console.log('userpage rendered')
@@ -265,15 +265,6 @@ app.get('/userpage', async (req, res,) => {
     let email = req.session.user
     current_reminder = []
     console.log(`this is the email ${email}`)
-});
-
-// Gets userpage for specific user based on ID
-app.get('/userpage:id', async (req, res) => {
-    let email = req.session.user
-    req.params[user_id]
-    // Changes to user page once logged in
-    res.render('userpage', {user_reminders: user_reminders});
-    console.log('user logged in');
 });
 
 // Log out function called when user presses logout
@@ -336,9 +327,9 @@ app.post('/reminders', async (req, res)  => {
             var finalTime = `12${slicedEnd} AM`
             console.log(date, finalTime, reminder);
         }
-        
-        const sqlInsert = "INSERT INTO reminders (id, reminder, date, time) VALUES (?, ?, ?, ?)";
-        const insert_query = mysql.format(sqlInsert,[id, reminder, date, finalTime]);
+        var len = user_reminders.length
+        const sqlInsert = "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
+        const insert_query = mysql.format(sqlInsert,[id, reminder, date, finalTime, len+1]);
         
         // Inserts the reminder information into the db
         db.query(insert_query, async (err, res) => {
@@ -348,7 +339,6 @@ app.post('/reminders', async (req, res)  => {
         })
         // Inserts an Object containing the user's reminder data into an array
         // This is so the user page reminder elements can change without relogging once reminder is created
-        let len = user_reminders.length
         console.log(`index of final reminder: ${len}`)
         user_reminders.push({
             id: len+1   ,
@@ -467,9 +457,10 @@ app.post('/editReminders', async (req, res) => {
                 let update_query = mysql.format(sqlUpdate,[{reminder: reminder}, arr['id']]);
                 
                 // Updates the reminder information into the db
-                db.query(update_query, async (err, res) => {
+                db.query(update_query, (err, res) => {
                     if (err) throw err;
                         console.log('reminder updated');
+                        console.log(res.affectedRows + " record(s) updated");
                 })
             }
             if (x == 1) {
@@ -478,9 +469,10 @@ app.post('/editReminders', async (req, res) => {
                 let update_query = mysql.format(sqlUpdate,[{date: date}, arr['id']]);
                 
                 // Updates the reminder information into the db
-                db.query(update_query, async (err, res) => {
+                db.query(update_query, (err, res) => {
                     if (err) throw err;
                         console.log('date updated');
+                        console.log(res.affectedRows + " record(s) updated");
                 })
             }
             if (x == 2) {
@@ -489,9 +481,11 @@ app.post('/editReminders', async (req, res) => {
                 let update_query = mysql.format(sqlUpdate,[{time: finalTime}, arr['id']]);
                 
                 // Updates the reminder information into the db
-                db.query(update_query, async (err, res) => {
+                db.query(update_query, (err, res) => {
                     if (err) throw err;
                         console.log('time updated');
+                        console.log(res.affectedRows + " record(s) updated");
+                        console.log(res)
                 })
             }
         }
