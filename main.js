@@ -390,23 +390,6 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
 
 // Calls function that edits reminder at specified ID
 app.get('/seeReminders/:edit/:id', async (req, res) => {
-    user_reminders.forEach(x => {
-        // ID of reminder user clicked on to delete
-        let id = req.params['id'];
-        //  ID param is an object so this gets the value of the object, returning the ID
-        let i = Object.values(id);
-        
-        // Checks which reminder i(the chosen reminders ID) is equal to
-        if (i == JSON.stringify(x['id'])) {
-            console.log(`index is ${user_reminders.indexOf(x)}`)
-            let index = user_reminders.indexOf(x)
-            // Removes reminder from user_reminders that user wants to delete
-            user_reminders.splice(index, 1)
-            console.log(user_reminders)
-            // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
-            console.log(`Reminders pushed: ${current_reminder}`);
-        }
-    })
     res.redirect('/editReminders')
 })
 
@@ -421,8 +404,6 @@ app.get('/checkreminder/:id', async (req, res) => {
         
         // Checks which reminder i(the chosen reminders ID) is equal to
         if (i == JSON.stringify(x['id'])) {
-            console.log(`Preparing to push reminders: ${Object.values(x)}`);
-            console.log(JSON.stringify(x['time']))
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
             current_reminder.push({
                 time: x['time'],
@@ -430,9 +411,33 @@ app.get('/checkreminder/:id', async (req, res) => {
                 content: x['content'],
                 id: x['id']
             });
-            console.log(`Reminders pushed: ${current_reminder}`);
         }
     })
     // Once the reminder is grabbed the user is redirected to the seeReminders page that displays this reminder
     res.redirect('/seeReminders');
+})
+
+// Gets the editReminders page which loads the reminder chosen by the user and allows them to edit it
+app.get('/editReminders', async (req, res) => {
+    res.render('editReminders', {current_reminder: current_reminder});
+})
+
+// Posts the editReminders page
+app.post('/editReminders', async (req, res) => {
+    let content = req.body.content
+    let time = req.body.time
+    let date = req.body.date
+    let id = req.body.id
+    user_reminders.forEach(x => {
+        // Checks which reminder i(the chosen reminders ID) is equal to
+        if (id == JSON.stringify(x['id'])) {
+            console.log(`Preparing to push reminders: ${Object.values(x)}`);
+            x['id'] = id
+            x['time'] = time
+            x['date'] = date
+            x['content'] = content
+            console.log(`Reminders edited: ${Object.values(x)}`);
+        }
+    })
+    res.redirect('/userpage')
 })
