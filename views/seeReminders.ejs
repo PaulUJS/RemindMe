@@ -44,13 +44,13 @@
                         <p><%= element.time %></p>   
                         <p class="content"><%= element.content %></p>   
                 </div>
-                <form action="/seeReminders/edit/<%= element.id %>">
-                <button type="submit" class="change" id="edit">Edit reminder</button>
+                <form action="/seeReminders/edit>">
+                <button method="get"type="edit" class="change" id="edit">Edit reminder</button>
                 </form>
                 <form action="/seeReminders/delete/<%= element.id %>">
-                <button type="submit" class="change" id="remove">Remove reminder</button>
+                <button type="delete" class="change" id="remove">Remove reminder</button>
                 </form>
-                        <% }) %> 
+                    <% }) %> 
             </div>
         </div>
     </main>

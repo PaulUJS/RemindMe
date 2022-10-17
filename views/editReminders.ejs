@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reminders</title>
+    <title>Edit Reminders</title>
     <link rel="stylesheet" href="reminders.css">
 </head>
 <body>
@@ -20,15 +20,16 @@
     <hr>
 
     <main>
-        <form action="/reminders" method="post" id="reminders">
+        <form action="/editReminders" method="post" id="reminders">
         <div class="reminder-main">
             <div class="reminder-container">
                 <div class="reminder-text">
-                    <label for="reminder-text">Enter reminder</label>
+                    <% current_reminder.forEach(element => { %>
+                    <label for="reminder-text">Edit reminder Reminder<label>
+                    <p name="id"><%= element.id %></p>
                 </div>
 
                 <div>
-                    <% current_reminder.forEach(element => { %>
                     <input type="text" name="reminder" id="reminder" value="<%= element.content %>" required>
                 </div>
                 
@@ -52,7 +53,9 @@
                 </div>
 
                 <div class="button">
+                    <form action="/editReminders" method="post">
                     <button type="submit" class="reminder-btn">RemindMe</button>
+                    </form>
                 </div>
             </div>
         </div>

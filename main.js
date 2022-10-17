@@ -16,7 +16,7 @@ var active = 0;
 
 //
 // Making this into an array lets me save the id without it refreshing every http request
-var user_id;
+var user_id = []
 
 // Reminder variables
 var reminderDate;
@@ -99,8 +99,9 @@ app.get('/createusertable', (req, res) =>{
 
 // Grabs current users reminders from db
 function getReminders(new_id) {
+
     const search = "SELECT * FROM reminders where id = ?";
-    const reminder_search = mysql.format(search, [new_id]);
+    const reminder_search = mysql.format(search, [new_id[0]]);
 
     db.query(reminder_search, async (err, res) => {
         if (err) throw err;
@@ -113,7 +114,7 @@ function getReminders(new_id) {
 
             console.log("------> reminder Results");
             console.log(res.length);
-            console.log(`new id is ${new_id}`)
+            console.log(`new id is ${new_id[0]}`)
             user_reminders.push({
                 date: reminderDate,
                 time: reminderTime,
@@ -239,7 +240,7 @@ app.post("/login", async (req, res)=> {
             console.log("---------> Login Successful");
             // Grabs the current logged in users ID
             const id = res[0].id;
-            user_id = id;
+            user_id.push(id);
             // Changes value of ID of the current user's ID
             getReminders(user_id)
         }
@@ -256,6 +257,7 @@ app.post("/login", async (req, res)=> {
 // Gets the user html page
 app.get('/userpage', async (req, res,) => {
     console.log('userpage received')
+    console.log(`this is user id ${user_id}`)
     // Renders userpage with the users reminders as html elements
     res.render('userpage', {user_reminders: user_reminders});
     console.log('userpage rendered')
@@ -282,6 +284,7 @@ app.get('/userpage/:logout', (req, res) => {
     // Sets the value of user_reminders array to empty
     // This is so when user logs back in their reminders aren't repeated multiple times
     user_reminders = [];
+    user_id = [];
     console.log(`list of reminders ${user_reminders.length}`)
     // After logging out the user is redirected to the home page
     res.redirect('/')
@@ -326,7 +329,7 @@ app.post('/reminders', async (req, res)  => {
             console.log(date, finalTime, reminder);
         }
         else if(timeInt < 12 && timeInt != 0) {
-            var finalTime = `${timeint}${slicedEnd} AM`;
+            var finalTime = `${timeInt}${slicedEnd} AM`;
             console.log(date, finalTime, reminder);
         }
         else if(timeInt === 0) {
@@ -389,7 +392,8 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
 })
 
 // Calls function that edits reminder at specified ID
-app.get('/seeReminders/:edit/:id', async (req, res) => {
+app.get('/seeReminders/:edit', async (req, res) => {
+    console.log('edit the reminder please')
     res.redirect('/editReminders')
 })
 
@@ -424,20 +428,82 @@ app.get('/editReminders', async (req, res) => {
 
 // Posts the editReminders page
 app.post('/editReminders', async (req, res) => {
-    let content = req.body.content
-    let time = req.body.time
-    let date = req.body.date
-    let id = req.body.id
-    user_reminders.forEach(x => {
-        // Checks which reminder i(the chosen reminders ID) is equal to
-        if (id == JSON.stringify(x['id'])) {
-            console.log(`Preparing to push reminders: ${Object.values(x)}`);
-            x['id'] = id
-            x['time'] = time
-            x['date'] = date
-            x['content'] = content
-            console.log(`Reminders edited: ${Object.values(x)}`);
+    db.connect( async (err, connect)=> {
+        if (err) throw err;
+
+        // Variables for reminder that will be inserted into db
+        let str = JSON.stringify(req.body.remindertime);
+        let date = req.body.reminderdate;
+        let reminder = req.body.reminder;
+        const arr = current_reminder[0]
+        const id = user_id[0]
+        let index = arr['id'] - 1;
+        var finalTime;
+
+        // Slices first 2 numbers in the reminder time 
+        const sliced = str.slice(1,3);
+        const slicedEnd = str.slice(3,6);
+        const timeInt = parseInt(sliced);
+        
+        // Checks if reminder time is AM or PM and changes the time to say which
+        if (timeInt >= 12) {
+            let newtime = timeInt - 12;
+            var finalTime = `${newtime}${slicedEnd} PM`;
+            console.log(date, finalTime, reminder);
         }
+        else if(timeInt < 12 && timeInt != 0) {
+            var finalTime = `${timeInt}${slicedEnd} AM`;
+            console.log(date, finalTime, reminder);
+        }
+        else if(timeInt === 0) {
+            var finalTime = `12${slicedEnd} AM`
+            console.log(date, finalTime, reminder);
+        }
+        
+        for (let x = 0; x < 3; x++){
+            if (x == 0){
+                // Needs to get the reminder based on user_id
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
+                let update_query = mysql.format(sqlUpdate,[{reminder: reminder}, arr['id']]);
+                
+                // Updates the reminder information into the db
+                db.query(update_query, async (err, res) => {
+                    if (err) throw err;
+                        console.log('reminder updated');
+                })
+            }
+            if (x == 1) {
+                // Needs to get the reminder based on user_id
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
+                let update_query = mysql.format(sqlUpdate,[{date: date}, arr['id']]);
+                
+                // Updates the reminder information into the db
+                db.query(update_query, async (err, res) => {
+                    if (err) throw err;
+                        console.log('date updated');
+                })
+            }
+            if (x == 2) {
+                // Needs to get the reminder based on user_id
+                let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ?";
+                let update_query = mysql.format(sqlUpdate,[{time: finalTime}, arr['id']]);
+                
+                // Updates the reminder information into the db
+                db.query(update_query, async (err, res) => {
+                    if (err) throw err;
+                        console.log('time updated');
+                })
+            }
+        }
+
+        // Inserts the edited reminder into an array, while removing the original reminder
+        user_reminders.splice(index, 1, {
+            id: arr['id'],
+            date: date,
+            time: finalTime,
+            content: reminder
+        })
+        console.log(user_reminders)
     })
     res.redirect('/userpage')
 })
