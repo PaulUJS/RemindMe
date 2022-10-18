@@ -113,21 +113,15 @@ function getReminders(new_id) {
             var reminderContent = res[x].reminder;
             var reminderID = x+1
 
-            console.log("------> reminder Results");
-            console.log(res.length);
-            console.log(`new id is ${new_id[0]}`)
             user_reminders.push({
                 date: reminderDate,
                 time: reminderTime,
                 content: reminderContent,
                 id: reminderID
             });
-
-            console.log(res);
         }
 
         if (res.length == 0) {
-            console.log("--------> no reminders");
         }
     })
 }
@@ -256,35 +250,28 @@ app.post("/login", (req, res)=> {
 );
 
 // Gets the user html page
-app.get('/userpage', (req, res,) => {
-    console.log('userpage received')
-    console.log(`this is user id ${user_id[0]}`)
+app.get('/userpage', async (req, res,) => {
     // Renders userpage with the users reminders as html elements
     res.render('userpage', {user_reminders: user_reminders});
-    console.log('userpage rendered')
-    // Check to make sure user matches profile
-    let email = req.session.user
-    current_reminder = []
-    console.log(`this is the email ${email}`)
+    current_reminder = [];
+
 });
 
 // Log out function called when user presses logout
 app.get('/userpage/:logout', (req, res) => {
     // Ends current user's session
     req.session.destroy();
-    console.log('User has logged out');
     // Sets the value of user_reminders array to empty
     // This is so when user logs back in their reminders aren't repeated multiple times
     user_reminders = [];
+    updated_reminder = [];
     user_id = [];
-    console.log(`list of reminders ${user_reminders.length}`)
     // After logging out the user is redirected to the home page
     res.redirect('/')
 });
 
 // Post request for user (used when they press add reminder)
 app.post('/userpage', (req, res) => {
-    console.log('User is making reminders');
     // Redirects user to the reminders page to make a reminder
     res.redirect('/reminders')
 });
@@ -318,15 +305,12 @@ app.post('/reminders',  (req, res)  => {
         if (timeInt >= 12) {
             let newtime = timeInt - 12;
             var finalTime = `${newtime}${slicedEnd} PM`;
-            console.log(date, finalTime, reminder);
         }
         else if(timeInt < 12 && timeInt != 0) {
-            var finalTime = `${timeInt}${slicedEnd} AM`;
-            console.log(date, finalTime, reminder);
+            var finalTime = `${timeInt}${slicedEnd} AM`;          
         }
         else if(timeInt === 0) {
             var finalTime = `12${slicedEnd} AM`
-            console.log(date, finalTime, reminder);
         }
         var len = user_reminders.length
         const sqlInsert = "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
@@ -335,19 +319,15 @@ app.post('/reminders',  (req, res)  => {
         // Inserts the reminder information into the db
         db.query(insert_query, async (err, res) => {
             if (err) throw err;
-                console.log('reminder created');
-                console.log(`User id ${id} made this reminder`)
         })
         // Inserts an Object containing the user's reminder data into an array
         // This is so the user page reminder elements can change without relogging once reminder is created
-        console.log(`index of final reminder: ${len}`)
         user_reminders.push({
             id: len+1   ,
             date: date,
             time: finalTime,
             content: reminder
         });
-        console.log(user_reminders)
     })
 });
 
@@ -377,36 +357,34 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
                 time: time,
                 id: re_id
             })
-            console.log(`updated_reminder number first ${updated_reminder}`)
         }
         // Checks which reminder i(the chosen reminders ID) is equal to
         if (i == JSON.stringify(x['id'])) {
             console.log(`index is ${user_reminders.indexOf(x)}`)
             var index = user_reminders.indexOf(x)
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
-            console.log(`Reminders pushed: ${current_reminder}`);
-            
+            user_reminders.splice(index, 1);
+            updated_reminder.push({
+                content: content,
+                date: date,
+                time: time,
+                id: re_id
+            })
             // query for deleting the reminder
             const sqlDelete = "DELETE FROM reminders WHERE id = ?";
             const delete_query = mysql.format(sqlDelete,[user_id[0]]);
             // Deletes the reminder information into the db
             db.query(delete_query, async (err, res) => {
                 if (err) throw err;
-                    console.log(`reminders deleted`);
-                    console.log(`User id ${user_id[0]} deleted this reminder`)
             })
         }
         if (i < x['id']) {
-            // Removes reminder from user_reminders that user wants to delete
-            user_reminders.splice(index, 1);
-            console.log(`removed`)
             updated_reminder.push({
                 content: content,
                 date: date,
                 time: time,
                 id: re_id -1
             })
-            console.log(`updated_reminder number next ${updated_reminder}`)
         }
     })
 
@@ -415,18 +393,14 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
         const insert_query = mysql.format(sqlInsert,[user_id[0], y['content'], y['date'],y['time'], y['id']]);
         db.query(insert_query, async (err, res) => {
             if (err) throw err;
-                console.log(`reminders inserted ${res.length}`);
-                console.log(res)
         })
     })
-
     // Once remnider is deleted user is redirected to user page
     res.redirect('/userpage')
 })
 
 // Calls function that edits reminder at specified ID
 app.get('/seeReminders/:edit',  (req, res) => {
-    console.log('edit the reminder please')
     res.redirect('/editReminders')
 })
 
@@ -482,15 +456,12 @@ app.post('/editReminders',  (req, res) => {
         if (timeInt >= 12) {
             let newtime = timeInt - 12;
             var finalTime = `${newtime}${slicedEnd} PM`;
-            console.log(date, finalTime, reminder);
         }
         else if(timeInt < 12 && timeInt != 0) {
             var finalTime = `${timeInt}${slicedEnd} AM`;
-            console.log(date, finalTime, reminder);
         }
         else if(timeInt === 0) {
             var finalTime = `12${slicedEnd} AM`
-            console.log(date, finalTime, reminder);
         }
         
         for (let x = 0; x < 3; x++){
@@ -502,8 +473,6 @@ app.post('/editReminders',  (req, res) => {
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
-                        console.log('reminder updated');
-                        console.log(res.affectedRows + " record(s) updated");
                 })
             }
             if (x == 1) {
@@ -514,8 +483,6 @@ app.post('/editReminders',  (req, res) => {
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
-                        console.log('date updated');
-                        console.log(res.affectedRows + " record(s) updated");
                 })
             }
             if (x == 2) {
@@ -526,9 +493,6 @@ app.post('/editReminders',  (req, res) => {
                 // Updates the reminder information into the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
-                        console.log('time updated');
-                        console.log(res.affectedRows + " record(s) updated");
-                        console.log(res)
                 })
             }
         }
@@ -540,7 +504,6 @@ app.post('/editReminders',  (req, res) => {
             time: finalTime,
             content: reminder
         })
-        console.log(user_reminders)
     })
     res.redirect('/userpage')
 })
@@ -553,7 +516,6 @@ app.get('/delete/:id', (req, res) => {
     // Deletes the reminder information into the db
     db.query(delete_query, async (err, res) => {
         if (err) throw err;
-            console.log(`User id ${id} deleted this reminder`)
     })
 })
 
@@ -563,6 +525,5 @@ app.get('/check/:id', (req, res) => {
     const reminder_search = mysql.format(search, [id]);
 
     db.query(reminder_search, async (err, res) => {
-        console.log(`this is the reminders ${JSON.stringify(res)}`)
     })
 })
