@@ -155,3 +155,13 @@ button {
 
     background-color: white;
 }
+
+hr {
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    left: 0px;
+    top: 73px;
+    background-color: #000000;
+    border: 1px solid #000000;
+}

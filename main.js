@@ -425,13 +425,13 @@ app.get('/seeReminders/:delete/:id', async (req, res) => {
 })
 
 // Calls function that edits reminder at specified ID
-app.get('/seeReminders/:edit', async (req, res) => {
+app.get('/seeReminders/:edit',  (req, res) => {
     console.log('edit the reminder please')
     res.redirect('/editReminders')
 })
 
 // Once user clicks on a reminder calls function that grabs the reminder
-app.get('/checkreminder/:id', async (req, res) => {
+app.get('/checkreminder/:id',  (req, res) => {
     // Iterates through user_reminders array
     user_reminders.forEach(x => {
         // ID of reminder user clicked on 
@@ -455,12 +455,12 @@ app.get('/checkreminder/:id', async (req, res) => {
 })
 
 // Gets the editReminders page which loads the reminder chosen by the user and allows them to edit it
-app.get('/editReminders', async (req, res) => {
+app.get('/editReminders',  (req, res) => {
     res.render('editReminders', {current_reminder: current_reminder});
 })
 
 // Posts the editReminders page
-app.post('/editReminders', async (req, res) => {
+app.post('/editReminders',  (req, res) => {
     db.connect( async (err, connect)=> {
         if (err) throw err;
 
