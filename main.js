@@ -12,6 +12,7 @@ require('dotenv').config();
 // User variables
 var user_reminders = [];
 var current_reminder = [];
+var updated_reminder = [];
 var active = 0;
 
 //
@@ -211,7 +212,7 @@ app.get('/login', (req, res) => {
 
 
 // Posts the login html page after submssion
-app.post("/login", async (req, res)=> {
+app.post("/login", (req, res)=> {
     // Grabs html data from form
     const email = req.body.email;
     const password = req.body.password;
@@ -255,7 +256,7 @@ app.post("/login", async (req, res)=> {
 );
 
 // Gets the user html page
-app.get('/userpage', async (req, res,) => {
+app.get('/userpage', (req, res,) => {
     console.log('userpage received')
     console.log(`this is user id ${user_id[0]}`)
     // Renders userpage with the users reminders as html elements
@@ -294,7 +295,7 @@ app.get('/reminders', (req, res) => {
 });
 
 // Post request for submitting the reminder
-app.post('/reminders', async (req, res)  => {
+app.post('/reminders',  (req, res)  => {
     // Once reminder is made user is sent back to the user page
     res.redirect('/userpage')
 
@@ -352,42 +353,73 @@ app.post('/reminders', async (req, res)  => {
 
 // Gets the seeReminders page
 // seeReminders page displays one speicifc reminder which they can edit/delete
-app.get('/seeReminders', async (req, res) => {
+app.get('/seeReminders',  (req, res) => {
     // Renders seeReminders with current_reminder array as html elements
     res.render('seeReminders', {current_reminder: current_reminder});
 })
 
 // Calls function that deletes the reminder at the specified ID
 app.get('/seeReminders/:delete/:id', async (req, res) => {
-    
+    // ID of reminder user clicked on to delete
+    let id = req.params['id'];
+    //  ID param is an object so this gets the value of the object, returning the ID
+    let i = Object.values(id);
+    current_reminder = []
     user_reminders.forEach(x => {
-        // ID of reminder user clicked on to delete
-        let id = req.params['id'];
-        //  ID param is an object so this gets the value of the object, returning the ID
-        let i = Object.values(id);
-        
+        let content = x['content']
+        let date = x['date']
+        let time = x['time']
+        let re_id = x['id']
+        if (i > x['id']) {
+            updated_reminder.push({
+                content: content,
+                date: date,
+                time: time,
+                id: re_id
+            })
+            console.log(`updated_reminder number first ${updated_reminder}`)
+        }
         // Checks which reminder i(the chosen reminders ID) is equal to
         if (i == JSON.stringify(x['id'])) {
             console.log(`index is ${user_reminders.indexOf(x)}`)
-            let index = user_reminders.indexOf(x)
-            // Removes reminder from user_reminders that user wants to delete
-            user_reminders.splice(index, 1)
-            console.log(user_reminders)
+            var index = user_reminders.indexOf(x)
             // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
             console.log(`Reminders pushed: ${current_reminder}`);
-
-            // query for deleting the reminder
-            const sqlDelete = "DELETE FROM reminders WHERE id = ? AND re_id = ?";
-            const delete_query = mysql.format(sqlDelete,[user_id, index+1]);
             
+            // query for deleting the reminder
+            const sqlDelete = "DELETE FROM reminders WHERE id = ?";
+            const delete_query = mysql.format(sqlDelete,[user_id[0]]);
             // Deletes the reminder information into the db
             db.query(delete_query, async (err, res) => {
                 if (err) throw err;
-                    console.log(`reminder ${index+1} deleted`);
-                    console.log(`User id ${id} deleted this reminder`)
+                    console.log(`reminders deleted`);
+                    console.log(`User id ${user_id[0]} deleted this reminder`)
             })
         }
+        if (i < x['id']) {
+            // Removes reminder from user_reminders that user wants to delete
+            user_reminders.splice(index, 1);
+            console.log(`removed`)
+            updated_reminder.push({
+                content: content,
+                date: date,
+                time: time,
+                id: re_id -1
+            })
+            console.log(`updated_reminder number next ${updated_reminder}`)
+        }
     })
+
+    updated_reminder.forEach(y => {
+        const sqlInsert = "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
+        const insert_query = mysql.format(sqlInsert,[user_id[0], y['content'], y['date'],y['time'], y['id']]);
+        db.query(insert_query, async (err, res) => {
+            if (err) throw err;
+                console.log(`reminders inserted ${res.length}`);
+                console.log(res)
+        })
+    })
+
     // Once remnider is deleted user is redirected to user page
     res.redirect('/userpage')
 })
@@ -511,4 +543,26 @@ app.post('/editReminders', async (req, res) => {
         console.log(user_reminders)
     })
     res.redirect('/userpage')
+})
+
+app.get('/delete/:id', (req, res) => {
+    let id = Object.values(req.params)
+    const sqlDelete = "DELETE FROM reminders WHERE id = ? ";
+    const delete_query = mysql.format(sqlDelete,[id]);
+            
+    // Deletes the reminder information into the db
+    db.query(delete_query, async (err, res) => {
+        if (err) throw err;
+            console.log(`User id ${id} deleted this reminder`)
+    })
+})
+
+app.get('/check/:id', (req, res) => {
+    let id = Object.values(req.params)
+    const search = "SELECT * FROM reminders where id = ?";
+    const reminder_search = mysql.format(search, [id]);
+
+    db.query(reminder_search, async (err, res) => {
+        console.log(`this is the reminders ${JSON.stringify(res)}`)
+    })
 })
