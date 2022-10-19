@@ -36,7 +36,6 @@ db.connect((err) => {
     if (err) {
         throw err;
     }
-    console.log("MySql has connected");
 });
 
 const app = express();
@@ -63,9 +62,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Sets up server with expressJS
-app.listen("3000", () => {
-    console.log("server started on port 3000");
-});
+app.listen("3000", () => {});
 
 // Grabs current users reminders from db
 function getReminders(new_id) {
@@ -76,10 +73,10 @@ function getReminders(new_id) {
         if (err) throw err;
 
         for (let x = 0; x < res.length; x++) {
-            var reminderDate = res[x].date;
-            var reminderTime = res[x].time;
-            var reminderContent = res[x].reminder;
-            var reminderID = x + 1;
+            let reminderDate = res[x].date;
+            let reminderTime = res[x].time;
+            let reminderContent = res[x].reminder;
+            let reminderID = x + 1;
 
             user_reminders.push({
                 date: reminderDate,
@@ -89,8 +86,7 @@ function getReminders(new_id) {
             });
         }
 
-        if (res.length == 0) {
-        }
+        if (res.length == 0) {}
     });
 }
 
@@ -135,19 +131,14 @@ app.post("/signup", async (req, res) => {
         // SQL search query to make sure this user isn't already registered
         db.query(search_query, async (err, res) => {
             if (err) throw err;
-            console.log("------> Search Results");
-            console.log(res.length);
 
-            if (res.length != 0) {
-                console.log("------> User already exists");
-            }
+            if (res.length != 0) {}
 
             // If the user isn't registered they get inserted into the db as a new user
             else {
                 db.query(insert_query, (err, res) => {
                     if (err) throw err;
-                    console.log("--------> Created new User");
-                    console.log(res.insertId);
+
                 });
             }
         });
@@ -158,13 +149,11 @@ app.post("/signup", async (req, res) => {
 app.get("/login", (req, res) => {
     // If the user is logged in redirects to the users profile
     if (req.session.authenticated == true) {
-        console.log(`active users 1`);
         res.redirect("/userpage");
     }
     // If user isn't logged in then they're sent the login page
     else {
         user_reminders = [];
-        console.log("no active users");
         res.render("login");
     }
 });
@@ -184,24 +173,21 @@ app.post("/login", (req, res) => {
     // Query to check if user exists in DB
     db.query(search_query, (err, res) => {
         if (err) throw err;
-        console.log("------> Search Results");
-        console.log(res.length);
-        if (res.length == 0) {
-            console.log("--------> User does not exist");
-        } else {
+
+        if (res.length == 0) {} 
+
+        else {
             //get the hashedPassword from res
             const hashedPass = res[0].password;
             // If user exists (checked by email) checks to see if password matches
             if (bcrypt.compare(password, hashedPass)) {
-                console.log("---------> Login Successful");
                 // Grabs the current logged in users ID
                 const id = res[0].id;
                 user_id.push(id);
                 // Changes value of ID of the current user's ID
                 getReminders(user_id);
-            } else {
-                console.log("---------> Password Incorrect");
-            }
+            } 
+            else {}
         }
     });
     // Once the user is correctly logged in they are sent to their user page
@@ -210,15 +196,9 @@ app.post("/login", (req, res) => {
 
 // Gets the user html page
 app.get("/userpage", (req, res) => {
-    if (req.session.authenticated = true) {
-        // Renders userpage with the users reminders as html elements
-        res.render("userpage", { user_reminders: user_reminders });
-        current_reminder = [];
-    }
-    else if (req.session.authenticated = false) {
-        // Redirects to main page if user isn't logged in
-        res.redirect('/')
-    }
+    // Renders userpage with the users reminders as html elements
+    res.render("userpage", { user_reminders: user_reminders });
+    current_reminder = [];
 });
 
 // Log out function called when user presses logout
@@ -229,6 +209,7 @@ app.get("/userpage/:logout", (req, res) => {
     // This is so when user logs back in their reminders aren't repeated multiple times
     user_reminders = [];
     updated_reminder = [];
+    // Removes the users id from the array once logged out
     user_id = [];
     // After logging out the user is redirected to the home page
     res.redirect("/");
@@ -257,9 +238,7 @@ app.post("/reminders", (req, res) => {
         let str = JSON.stringify(req.body.remindertime);
         let reminder = req.body.reminder;
         let date = new Date(req.body.reminderdate);
-        date.setHours(0,0,0,0)
         const id = user_id;
-        var finalTime;
 
         // Slices first 2 numbers in the reminder time
         const sliced = str.slice(1, 3);
@@ -276,15 +255,8 @@ app.post("/reminders", (req, res) => {
             var finalTime = `12${slicedEnd} AM`;
         }
         var len = user_reminders.length;
-        const sqlInsert =
-            "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
-        const insert_query = mysql.format(sqlInsert, [
-            id,
-            reminder,
-            date,
-            finalTime,
-            len + 1,
-        ]);
+        const sqlInsert = "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
+        const insert_query = mysql.format(sqlInsert, [id,reminder,date,finalTime,len + 1,]);
 
         // Inserts the reminder information into the db
         db.query(insert_query, async (err, res) => {
@@ -308,17 +280,19 @@ app.get("/seeReminders", (req, res) => {
 });
 
 // Calls function that deletes the reminder at the specified ID
-app.get("/seeReminders/:delete/:id", async (req, res) => {
+app.get("/seeReminders/:delete/:id", (req, res) => {
     // ID of reminder user clicked on to delete
     let id = req.params["id"];
     //  ID param is an object so this gets the value of the object, returning the ID
     let i = Object.values(id);
     current_reminder = [];
     user_reminders.forEach((x) => {
+        // Gets reminder values for each reminder object in the array
         let content = x["content"];
         let date = x["date"];
         let time = x["time"];
         let re_id = x["id"];
+        // If the reminder id is less than the reminder being deleted it's pushed into the array for updated reminders
         if (i > x["id"]) {
             updated_reminder.push({
                 content: content,
@@ -329,24 +303,27 @@ app.get("/seeReminders/:delete/:id", async (req, res) => {
         }
         // Checks which reminder i(the chosen reminders ID) is equal to
         if (i == JSON.stringify(x["id"])) {
-            console.log(`index is ${user_reminders.indexOf(x)}`);
             var index = user_reminders.indexOf(x);
-            // Once the reminder is found in user_reminders the data is pushed into the current_reminder array as an object
+            // Once the reminder is found in user_reminders it is removed
             user_reminders.splice(index, 1);
+            // This changes where reminder x represents so after deleting the reminder, x represents the next reminder
+            // This reminder is pushed into the array
             updated_reminder.push({
                 content: content,
                 date: date,
                 time: time,
                 id: re_id,
             });
-            // query for deleting the reminder
+            // Deletes all reminders from the database
             const sqlDelete = "DELETE FROM reminders WHERE id = ?";
             const delete_query = mysql.format(sqlDelete, [user_id[0]]);
             // Deletes the reminder information into the db
-            db.query(delete_query, async (err, res) => {
+            db.query(delete_query, (err, res) => {
                 if (err) throw err;
             });
         }
+        // Checks if if the deleted reminder's id is less than the id of reminder x it's pushed into the array
+        // All reminders pushed here have their id decreased by 1 so the id of the reminder after the deleted reminder doesn't skip a number
         if (i < x["id"]) {
             updated_reminder.push({
                 content: content,
@@ -357,9 +334,9 @@ app.get("/seeReminders/:delete/:id", async (req, res) => {
         }
     });
 
+    // Each reminder in the updated_reminder array is inserted into the reminders db to keep the re_id values from being wrong
     updated_reminder.forEach((y) => {
-        const sqlInsert =
-            "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
+        const sqlInsert = "INSERT INTO reminders (id, reminder, date, time, re_id) VALUES (?, ?, ?, ?, ?)";
         const insert_query = mysql.format(sqlInsert, [
             user_id[0],
             y["content"],
@@ -440,43 +417,28 @@ app.post("/editReminders", (req, res) => {
 
         for (let x = 0; x < 3; x++) {
             if (x == 0) {
-                // Needs to get the reminder based on user_id
                 let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
-                let update_query = mysql.format(sqlUpdate, [
-                    { reminder: reminder },
-                    arr["id"],
-                    user_id[0],
-                ]);
+                let update_query = mysql.format(sqlUpdate, [{ reminder: reminder }, arr["id"], user_id[0],]);
 
-                // Updates the reminder information into the db
+                // Updates the reminder content into the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
                 });
             }
             if (x == 1) {
-                // Needs to get the reminder based on user_id
                 let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
-                let update_query = mysql.format(sqlUpdate, [
-                    { date: date },
-                    arr["id"],
-                    user_id[0],
-                ]);
+                let update_query = mysql.format(sqlUpdate, [{ date: date },arr["id"], user_id[0],]);
 
-                // Updates the reminder information into the db
+                // Updates the reminder date in the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
                 });
             }
             if (x == 2) {
-                // Needs to get the reminder based on user_id
                 let sqlUpdate = "UPDATE reminders SET ? WHERE re_id = ? AND id = ?";
-                let update_query = mysql.format(sqlUpdate, [
-                    { time: finalTime },
-                    arr["id"],
-                    user_id[0],
-                ]);
+                let update_query = mysql.format(sqlUpdate, [{ time: finalTime },arr["id"], user_id[0],]);
 
-                // Updates the reminder information into the db
+                // Updates the reminder time in the db
                 db.query(update_query, (err, res) => {
                     if (err) throw err;
                 });
