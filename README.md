@@ -2,7 +2,7 @@
 ## Overview
 RemindMe is a website that I started making to help me remember future plans, and appointments I have because otherwise they are scatterd
 randomly throughout my notes app. I made this with HTML, CSS, and vanilla javascript for the frontend, and used node.js express.js, and mySQL database 
-for the backend.
+for the backend. This project does not have many commits because I didn't set up the repository until I coded a majority of it, not thinking to make it earlier.
 ## Landing page
 Remind me has a landing page that's meant to explain the purpose of the website, and navigation that leads to the sign up, and log in pages
 ## Sign up and Log in pages
