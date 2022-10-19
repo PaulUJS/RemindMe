@@ -4,7 +4,14 @@ const mysql = require("mysql2");
 const express = require("express");
 const { send, sendStatus } = require("express/lib/response");
 require("dotenv").config();
-import { db } from "./db.mjs"
+
+// Create the db connection
+const db = mysql.createConnection({
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+});
 
 // Connect to database
 db.connect((err) => {

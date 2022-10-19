@@ -9,7 +9,7 @@ const { send, sendStatus } = require("express/lib/response");
 const store = new session.MemoryStore();
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-import { db } from "./db.mjs";
+
 
 // User variables
 var user_reminders = [];
@@ -22,6 +22,14 @@ var active = 0;
 var reminderDate;
 var reminderTime;
 var reminderContent;
+
+// Create the db connection
+const db = mysql.createConnection({
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+});
 
 // Connect to database
 db.connect((err) => {
@@ -201,10 +209,16 @@ app.post("/login", (req, res) => {
 });
 
 // Gets the user html page
-app.get("/userpage", async (req, res) => {
-    // Renders userpage with the users reminders as html elements
-    res.render("userpage", { user_reminders: user_reminders });
-    current_reminder = [];
+app.get("/userpage", (req, res) => {
+    if (req.session.authenticated = true) {
+        // Renders userpage with the users reminders as html elements
+        res.render("userpage", { user_reminders: user_reminders });
+        current_reminder = [];
+    }
+    else if (req.session.authenticated = false) {
+        // Redirects to main page if user isn't logged in
+        res.redirect('/')
+    }
 });
 
 // Log out function called when user presses logout
@@ -243,6 +257,7 @@ app.post("/reminders", (req, res) => {
         let str = JSON.stringify(req.body.remindertime);
         let reminder = req.body.reminder;
         let date = new Date(req.body.reminderdate);
+        date.setHours(0,0,0,0)
         const id = user_id;
         var finalTime;
 
