@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const { send, sendStatus } = require("express/lib/response");
 const store = new session.MemoryStore();
 const nodemailer = require("nodemailer");
+const { error } = require("console");
 require("dotenv").config();
 
 
@@ -159,39 +160,51 @@ app.get("/login", (req, res) => {
 });
 
 // Posts the login html page after submssion
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     // Grabs html data from form
     const email = req.body.email;
     const password = req.body.password;
-
+    const res_var = res
+    const req_var = req
     const sqlSearch = "SELECT * FROM user where email = ?";
     const search_query = mysql.format(sqlSearch, [email]);
-    // Once user is authetnicated changes their session to authenticated
-    //  Also changes the session user to current user
-    req.session.authenticated = true;
-    req.session.user = `${email}`;
+
     // Query to check if user exists in DB
-    db.query(search_query, (err, res) => {
-        if (err) throw err;
+    db.query(search_query, async (err, res) => {
+        try {
 
-        if (res.length == 0) {} 
-
-        else {
-            //get the hashedPassword from res
-            const hashedPass = res[0].password;
-            // If user exists (checked by email) checks to see if password matches
-            if (bcrypt.compare(password, hashedPass)) {
-                // Grabs the current logged in users ID
-                const id = res[0].id;
-                user_id.push(id);
-                // Changes value of ID of the current user's ID
-                getReminders(user_id);
+            if (res.length == 0) {
+                console.log('no users with that email')
+                req_var.session.authenticated = false;
+                throw error
             } 
-            else {}
+
+            else {
+                //get the hashedPassword from res
+                const hashedPass = res[0].password;
+                // If user exists (checked by email) checks to see if password matches
+                if (await bcrypt.compare(password, hashedPass) == true) {
+                    // Grabs the current logged in users ID
+                    const id = res[0].id;
+                    user_id.push(id);
+                    // Once user is authetnicated changes their session to authenticated
+                    //  Also changes the session user to current user
+                    req_var.session.authenticated = true;
+                    req_var.session.user = `${email}`;
+                    // Changes value of ID of the current user's ID
+                    getReminders(user_id);
+                    res_var.redirect('/userpage')
+                } 
+                else if (await bcrypt.compare(password, hashedPass) == false){
+                    req_var.session.authenticated = false;
+                    res_var.redirect('/')
+                }
+            }
         }
-    });
-    // Once the user is correctly logged in they are sent to their user page
-    res.redirect(`/userpage`);
+        catch(error) {
+            res_var.redirect('/')
+        }
+        });
 });
 
 // Gets the user html page
@@ -213,6 +226,9 @@ app.get("/userpage/:logout", (req, res) => {
     user_id = [];
     // After logging out the user is redirected to the home page
     res.redirect("/");
+
+    res.redirect('/userpage')
+
 });
 
 // Post request for user (used when they press add reminder)
@@ -237,7 +253,7 @@ app.post("/reminders", (req, res) => {
         // Variables for reminder that will be inserted into db
         let str = JSON.stringify(req.body.remindertime);
         let reminder = req.body.reminder;
-        let date = new Date(req.body.reminderdate);
+        let date = req.body.reminderdate;
         const id = user_id;
 
         // Slices first 2 numbers in the reminder time
@@ -331,6 +347,9 @@ app.get("/seeReminders/:delete/:id", (req, res) => {
                 time: time,
                 id: re_id - 1,
             });
+        }
+        if (user_reminders.length <= 1) {
+            updated_reminder = []
         }
     });
 
@@ -454,25 +473,4 @@ app.post("/editReminders", (req, res) => {
         });
     });
     res.redirect("/userpage");
-});
-
-app.get("/delete/:id", (req, res) => {
-    let id = Object.values(req.params);
-    const sqlDelete = "DELETE FROM reminders WHERE id = ? ";
-    const delete_query = mysql.format(sqlDelete, [id]);
-
-    // Deletes the reminder information into the db
-    db.query(delete_query, async (err, res) => {
-        if (err) throw err;
-    });
-});
-
-app.get("/check/:id", (req, res) => {
-    let id = Object.values(req.params);
-    const search = "SELECT * FROM reminders where id = ?";
-    const reminder_search = mysql.format(search, [id]);
-
-    db.query(reminder_search, async (err, res) => {
-        console.log(res);
-    });
 });
