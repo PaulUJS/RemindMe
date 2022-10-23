@@ -55,6 +55,7 @@ app.use(
 // Makes the css and html files accessable
 app.use(express.static(path.join(__dirname, "/views")));
 app.use(express.static(path.join(__dirname, "/public")));
+app.use(express.static(path.join(__dirname, "/image")));
 
 app.set("view engine", "ejs");
 
