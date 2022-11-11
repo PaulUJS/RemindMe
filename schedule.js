@@ -15,10 +15,7 @@ const db = mysql.createConnection({
 
 // Connect to database
 db.connect((err) => {
-    if (err) {
-        throw err;
-    }
-    console.log("MySql has connected");
+    if (err) throw err;
 });
 
 // Schedule tasks to be run on the server.
@@ -34,10 +31,10 @@ cron.schedule("0 0 * * *", function () {
         if (err) throw err;
         // iterates through the reminders
         for (let x = 0; x > res.length; x++) {
-            var reminderDate = JSON.stringify(res[x].date);
-            var reminderTime = JSON.stringify(res[x].time);
-            var reminderContent = JSON.stringify(res[x].reminder);
-            var remidnerEmail = JSON.stringify(res[x].email)
+            let reminderDate = JSON.stringify(res[x].date);
+            let reminderTime = JSON.stringify(res[x].time);
+            let reminderContent = JSON.stringify(res[x].reminder);
+            let remidnerEmail = JSON.stringify(res[x].email)
             // Calls function that sends the reminder email to the email corresponding to the reminder
             main(remidnerEmail, reminderContent, reminderTime, reminderDate)
         }
@@ -63,6 +60,4 @@ async function main(email, reminder, time, date) {
         subject: "reminder", // Subject line
         text: `Don't forget, you have a reminder: ${reminder} on ${date} at ${time}, Thank you for using our service and have a great day!` // plain text body
     });
-
-    console.log("Email has been sent");
 }
