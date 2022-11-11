@@ -20,7 +20,7 @@
                     <form action="/userpage/logout" method="put" id="log_out">
                     <li>
                         <a href="">
-                        <button class="log-out" id="log">
+                        <button onClick="LogOut()" class="log-out" id="log">
                         logout
                         </button>
                         </a>
@@ -60,7 +60,10 @@
     </main>
 
 
-    <script src="main.js" type="script/javascript">
+    <script>
+        function LogOut() {
+            confirm("Are you sure you want to log out?")
+        }
     </script>
 </body>
 </html>

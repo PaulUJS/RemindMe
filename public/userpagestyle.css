@@ -192,3 +192,11 @@ a {
     text-align: center;
     background-color: white;
 }
+
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+}

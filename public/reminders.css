@@ -86,6 +86,7 @@ nav {
     text-align: center;
     font-family: 'Inter';
     font-style: normal;
+    border-style: none;
 }
 
 .reminder {
@@ -100,6 +101,7 @@ nav {
     text-align: center;
     font-family: 'Inter';
     font-style: normal;
+    border-style: none;
 }
 
 .remindertime {
@@ -111,6 +113,7 @@ nav {
     text-align: center;
     font-family: 'Inter';
     font-style: normal;
+    border-style: none;
 }
 
 input {
@@ -136,6 +139,7 @@ input[type=date]::-webkit-calendar-picker-indicator {
     width    : 2em;
     transform: translateX(-1.25em);
     opacity  : 1;
+    border-style: none;
 }
 
 input[type=time]::-webkit-calendar-picker-indicator {
@@ -144,6 +148,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
     width    : 2em;
     transform: translateX(-1.25em);
     opacity  : 1;
+    border-style: none;
 }
 
 
@@ -152,8 +157,9 @@ button {
     height: 75px;
     border-radius: 100px;
     margin-top: 10px;
-
+    transition: all 0.3s ease;
     background-color: white;
+    border-style: none;
 }
 
 hr {
@@ -164,4 +170,8 @@ hr {
     top: 73px;
     background-color: #000000;
     border: 1px solid #000000;
+}
+
+button:hover {
+    transform: scale(1.1);
 }

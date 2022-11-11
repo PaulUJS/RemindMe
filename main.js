@@ -32,14 +32,14 @@ db.connect((err) => {
 
 const app = express();
 
-// Creating the app login session manager
+const oneDay = 1000 * 60 * 60 * 24;
+
 app.use(
     session({
-        secret: "secret",
-        resave: true,
-        saveUninitialized: false,
-        cookie: { maxAge: 30000 },
-        store,
+        secret: "3Kbn1nA*oW)N",
+        saveUninitialized:true,
+        cookie: { maxAge: oneDay },
+        resave: false 
     })
 );
 
@@ -184,6 +184,7 @@ app.get("/userpage", (req, res) => {
     // Renders userpage with the users reminders as html elements
     res.render("userpage", { user_reminders: user_reminders });
     current_reminder = [];
+    updated_reminder = []
 });
 
 app.get("/userpage/:logout", (req, res) => {
@@ -192,7 +193,6 @@ app.get("/userpage/:logout", (req, res) => {
     // Sets the value of user_reminders array to empty
     // This is so when user logs back in their reminders aren't repeated multiple times
     user_reminders = [];
-    updated_reminder = [];
 
     res.redirect("/");
 });
@@ -259,6 +259,7 @@ app.get("/seeReminders/:delete/:id", (req, res) => {
     let id = req.params["id"];
     //  ID param is an object so this gets the value of the object, returning the ID
     let i = Object.values(id);
+    // Returns the value of the arr to empty after it's no longer needed
     current_reminder = [];
     user_reminders.forEach((x) => {
         // Gets reminder values from each reminder object in the array

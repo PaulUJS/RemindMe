@@ -90,7 +90,7 @@ nav ul {
     text-align: center;
     width: 600px;
     height: 75px;
-
+    border-style: none;
 }
 
 .email {
@@ -102,7 +102,7 @@ nav ul {
     text-align: center;
     width: 600px;
     height: 75px;
-
+    border-style: none;
 }
 
 
@@ -130,6 +130,8 @@ button {
     height: 75px;
     border-radius: 100px;
     margin-top: 25px;
+    transition: all 0.3s ease;
+    background-color: white;
 }
 
 a {
@@ -145,4 +147,8 @@ hr {
     top: 73px;
     background-color: #000000;
     border: 1px solid #000000;
+}
+
+button:hover {
+    transform: scale(1.1);
 }

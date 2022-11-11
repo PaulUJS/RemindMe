@@ -199,3 +199,11 @@ nav ul {
 a {
     text-decoration: none;
 }
+
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
