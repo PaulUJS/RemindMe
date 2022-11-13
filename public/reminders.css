@@ -160,6 +160,7 @@ button {
     transition: all 0.3s ease;
     background-color: white;
     border-style: none;
+    font-size: 26px
 }
 
 hr {

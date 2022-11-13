@@ -88,7 +88,11 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
-    res.render("index")
+    if (req.session.authenticated) {
+        res.redirect("/userpage")
+    } else {
+        res.render("/")
+    }
 })
 
 app.get("/signup", (req, res) => {
@@ -155,7 +159,7 @@ app.post("/login", async (req, res) => {
     // Query to check if user exists in DB
     db.query(search_query, async (err, result) => {
             if (result.length == 0) {
-                req_var.session.authenticated = false
+                req.session.authenticated = false
             } 
 
             else {
