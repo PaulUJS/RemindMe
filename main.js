@@ -9,6 +9,7 @@ const { send, sendStatus } = require("express/lib/response");
 const store = new session.MemoryStore();
 const nodemailer = require("nodemailer");
 const { error } = require("console");
+const { env } = require("process");
 require("dotenv").config();
 
 // User variables
@@ -26,7 +27,7 @@ const db = mysql.createConnection({
 
 // Connect to database
 db.connect((err) => {
-    if (err) throw err
+    if (err) throw err;
 });
 
 const app = express()
@@ -35,7 +36,7 @@ const oneDay = 1000 * 60 * 60 * 24
 
 app.use(
     session({
-        secret: "3Kbn1nA*oW)N",
+        secret: process.env.SESSION_SECRET,
         saveUninitialized:true,
         cookie: { maxAge: oneDay },
         resave: false 
@@ -54,7 +55,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Sets up server with expressJS
-app.listen("3000", () => {})
+app.listen(process.env.PORT, () => {})
 
 // Grabs current users reminders from db
 function getReminders(new_id) {
