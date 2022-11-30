@@ -161,6 +161,7 @@ app.post("/login", async (req, res) => {
     db.query(search_query, async (err, result) => {
             if (result.length == 0) {
                 req.session.authenticated = false
+                res.redirect('/')
             } 
 
             else {
