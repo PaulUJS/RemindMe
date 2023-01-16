@@ -207,3 +207,15 @@ button {
 button:hover {
     transform: scale(1.1);
 }
+
+footer {
+    background-color: #B8B8EF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer a {
+    text-decoration: underline;
+    color: black;
+}
